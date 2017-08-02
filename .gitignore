@@ -1,0 +1,6 @@
+*~
+*.swp
+*.cf
+*.o
+alu_tb
+*.vcd
