@@ -1,7 +1,7 @@
 %.o: %.vhdl
 	ghdl -a $<
 
-alu_tb: common.o alu.o alu_tb.o
+alu_tb: common.o alu.o alu_tb.o regfile.o cpu.o
 	ghdl -e $@
 
 run: alu_tb
@@ -9,4 +9,9 @@ run: alu_tb
 
 view: run
 	gtkwave alu.vcd
+
+clean:
+	rm -rf *.o *.vcd work-obj93.cf alu_tb
+
+all: run
 
