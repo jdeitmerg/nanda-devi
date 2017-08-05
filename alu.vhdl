@@ -10,23 +10,61 @@ entity alu is
     port (
         arg0, arg1 : in word_t;
         op : in alu_op_t;
-        result : out word_t
+        result : out word_t;
+        carry_in : in std_logic;
+        carry_out, zero_out, neg_out: out std_logic
     );
 end alu;
 
 architecture arch of alu is
+    -- To get the carry output, we need to add another bit to the first
+    -- (left) argument. All other arguments will be extended to the same
+    -- width automatically.
+    subtype word_carry is unsigned(WORDWIDTH downto 0);
+    signal arg0_ext : word_carry; -- first argument with a carry of 0
+    signal res_ext  : word_carry; -- result and output carry
+    -- For setting the carry to 0 where it wouldn't make any sense:
+    signal carry_mask : word_carry :=
+                        not unsigned('1' & resize(unsigned'("0"), WORDWIDTH));
+    signal carry_in_cast : unsigned(0 downto 0);
+    signal arg1_cast : unsigned(WORDWIDTH-1 downto 0);
 begin
-    result <= word_t (unsigned(arg0) + unsigned(arg1))
-                when (op = alu_uadd) else
-              word_t (unsigned(arg0) - unsigned(arg1))
-                when (op = alu_usub) else
-              word_t (signed(arg0) + signed(arg1))
-                when (op = alu_sadd) else
-              word_t (signed(arg0) - signed(arg1))
-                when (op = alu_ssub) else
-              arg0 or arg1
-                when (op = alu_or) else
-              (others => '0');
+    -- Helper variables
+    arg0_ext <= unsigned('0' & arg0);
+    carry_in_cast(0) <= carry_in;
+    arg1_cast <= unsigned(arg1);
+    -- Outputs
+    result <= std_logic_vector(res_ext(WORDWIDTH-1 downto 0));
+    carry_out <= res_ext(WORDWIDTH);
+    neg_out <= res_ext(WORDWIDTH-1);
+    zero_out <= '1' when res_ext(WORDWIDTH-1 downto 0) = 0 else '0';
+
+    res_ext <=  arg0_ext + arg1_cast
+                    when (op = alu_add) else
+                arg0_ext - arg1_cast
+                    when (op = alu_sub) else
+                arg0_ext + arg1_cast + carry_in_cast
+                    when (op = alu_addc) else
+                arg0_ext - arg1_cast - carry_in_cast
+                    when (op = alu_subc) else
+                (arg0_ext or arg1_cast) and carry_mask
+                    when (op = alu_or) else
+                (arg0_ext xor arg1_cast) and carry_mask
+                    when (op = alu_xor) else
+                (arg0_ext and arg1_cast) and carry_mask
+                    when (op = alu_and) else
+                (not arg0_ext) and carry_mask
+                    when (op = alu_not) else
+                -- This nicely shifts into the carry bit.
+                arg0_ext sll to_integer(arg1_cast)
+                    when (op = alu_sll) else
+                -- Put the carry on the right, then rotate everything to
+                -- put it where it belongs.
+                (unsigned(arg0 & '0') srl to_integer(arg1_cast)) ror 1
+                    when (op = alu_slr) else
+                (arg0_ext) and carry_mask
+                    when (op = alu_tst) else
+                (others => '0');
 
 end arch;
 

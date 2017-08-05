@@ -9,12 +9,19 @@ package common is
 
     -- Possible ALU operations. Enum is not an option, as these have to
     -- be known to the assembler.
-    subtype alu_op_t is unsigned(3 downto 0);
-    constant alu_uadd   : alu_op_t := X"0"; -- unsigned addition
-    constant alu_usub   : alu_op_t := X"1"; -- unsigned substractionl
-    constant alu_sadd   : alu_op_t := X"2"; -- signed addition
-    constant alu_ssub   : alu_op_t := X"3"; -- signed substraction
-    constant alu_or     : alu_op_t := X"4"; -- bitwise logical or
+    subtype alu_op_t is unsigned(4 downto 0);
+    constant alu_add    : alu_op_t := "00000"; -- addition
+    constant alu_sub    : alu_op_t := "00001"; -- substractionl
+    constant alu_addc   : alu_op_t := "00010"; -- addition with carry
+    constant alu_subc   : alu_op_t := "00011"; -- substraction with carry
+    constant alu_or     : alu_op_t := "00100"; -- bitwise logical or
+    constant alu_xor    : alu_op_t := "00101"; -- bitwise logical xor
+    constant alu_and    : alu_op_t := "00110"; -- bitwise logical and
+    constant alu_not    : alu_op_t := "00111"; -- bitwise logical not
+    constant alu_sll    : alu_op_t := "01000"; -- shift logical left
+    constant alu_slr    : alu_op_t := "01001"; -- shift logical right
+    constant alu_tst    : alu_op_t := "01010"; -- test (only set flags)
+
 
     -- Indices of special registers in regfile
     constant reg_pc    : integer range 0 to 18 := 16;
