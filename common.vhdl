@@ -1,3 +1,8 @@
+-- file common.vhdl
+--
+-- Includes generic defines as well as the constants of the instruction
+-- set.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -28,5 +33,37 @@ package common is
     constant reg_sp    : integer range 0 to 18 := 17;
     constant reg_flags : integer range 0 to 18 := 18;
 
+    -- Flow control defines and constants
+    subtype flow_control_t is std_logic_vector(3 downto 0);
+    constant flowc_normal : flow_control_t := "0000";
+    constant flowc_skipc  : flow_control_t := "0001";
+    constant flowc_skipz  : flow_control_t := "0010";
+    constant flowc_skipn  : flow_control_t := "0100";
+    -- If bit 3 is set, skip if flag is cleared. If it's cleared, skip if
+    -- flag is set.
+    constant flowc_inv_pos : integer := 3;
+
+    -- There are four possible sources for the data bus (which feeds the
+    -- registers and memory write port): ALU output, first ALU argument,
+    -- the immediate from the instruction decoder and memory.
+    subtype dsrc_t is integer range 0 to 3;
+    constant dsrc_ALU       : dsrc_t := 0;
+    constant dsrc_arg0      : dsrc_t := 1;
+    constant dsrc_immediate : dsrc_t := 2;
+    constant dsrc_mem       : dsrc_t := 3;
+
+    -- Groups of instructions:
+    subtype instrg_t is std_logic_vector(4 downto 0);
+    constant instrg_ldi   : instrg_t := "00000"; -- load immediate
+    constant instrg_ALU   : instrg_t := "00001";
+    constant instrg_cpy   : instrg_t := "00010"; -- copy and move
+    constant instrg_cond  : instrg_t := "00011"; -- conditional jumps/skips
+
+    -- Actual command in a move/copy instruction:
+    subtype mvcp_t is std_logic_vector(1 downto 0);
+    constant mvcp_mv  : mvcp_t := "00";
+    constant mvcp_ldm : mvcp_t := "01";
+    constant mvcp_stm : mvcp_t := "10";
+
 end common;
-  
+

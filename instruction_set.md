@@ -52,9 +52,9 @@ transfers.
 
 As it would be crazy to handle register to register transfers *through*
 the ALU, we shall allocate another instruction just for that.
-2 * 5 bits for source and destination = 10 bits.
+3 * 5 bits for source, value and destination = 15 bits.
 
-We'll waste that one bit difference and allocate **12 bits** for all
+We'll waste that 4 bit difference and allocate **17 bits** for all
 memory + copy instructions
 
 ## (Conditional) jumps
@@ -71,8 +71,8 @@ instructions to load an offset and add it to the program counter.
 To offer some more flexibility, allow skipping if flags are *not* set
 as well.
 
-With only 6 possible instructions we'll still allocate **4 bits**
-for conditional jumps (that is, **conditional skips**).
+With only 6 possible instructions we'd need only 3 bits. We'll allocate
+**9 bits** instead to make the instruction decoder simpler.
 
 ## Ideas for improvement
 
@@ -88,6 +88,9 @@ We got only 4 different groups of instructions and the biggest of them
 needs 26 bits. 5 bits shall be allocated for the instruction group,
 that leaves another 28 instruction groups to be implemented with a
 maximum size of 27 bits.
+
+By numbering the groups as done below, only one 8th of the available
+instruction space is used.
 
 Source registers (src1, src0) can be any value if not applicable. If no
 register is to be written, dest has to be set to 19.
@@ -133,27 +136,27 @@ Only these ALU instructions update the flags register.
 * ldm: Load value pointed to by src register to dest register.
 * stm: Store src register at memory location specified by dest register.
 
-|     | 31 ... 28 27 | 26 ... 12 | 11 10 | 9 ... 5 | 4 ... 0| 
-|-----|--------------|-----------|-------|---------|--------|
-|     |  0  0   1  0 |  0  0   0 |       |   src   |  dest  |
+|     | 31 ... 28 27 | 26 ... 17 | 16 15 | 14 ... 10 | 9 ... 5 | 4 ... 0|
+|-----|--------------|-----------|-------|-----------|---------|--------|
+|     |  0  0   1  0 |  0  0   0 |       |           |         |        |
 |
-| mv  |  0  0   1  0 |  0  0   0 |  0  0 |   src   |  dest  |
-| ldm |  0  0   1  0 |  0  0   0 |  0  1 |  [src]  |  dest  |
-| stm |  0  0   1  0 |  0  0   0 |  1  0 |   src   | [dest] |
+| mv  |  0  0   1  0 |  0  0   0 |  0  0 |  0 0 0 0  |   src   |  dest  |
+| ldm |  0  0   1  0 |  0  0   0 |  0  1 |   [src]   | 0 0 0 0 |  dest  |
+| stm |  0  0   1  0 |  0  0   0 |  1  0 |  [dest]   |   src   |  10011 |
 
 
 # Conditions jumps/skips
 
 * Mnemonic is always **s**kip **c/z/n**-flag **s/c** set/cleared
 
-|     | 31 ... 28 27 | 26 ... 4 | 3 2 1 0 | 
-|-----|--------------|----------|---------|
-|     |  0  0   1  1 |  0  0  0 |         |
+|     | 31 ... 28 27 | 26 ... 9 | 8 7 6 5 | 4 3 2 1 0 |
+|-----|--------------|----------|---------|-----------|
+|     |  0  0   1  1 |  0  0  0 |         | 1 0 0 1 1 |
 |
-| scs |  0  0   1  1 |  0  0  0 | 0 0 0 0 |
-| scc |  0  0   1  1 |  0  0  0 | 1 0 0 0 |
-| szs |  0  0   1  1 |  0  0  0 | 0 0 0 1 |
-| szc |  0  0   1  1 |  0  0  0 | 1 0 0 1 |
-| sns |  0  0   1  1 |  0  0  0 | 0 0 1 0 |
-| snc |  0  0   1  1 |  0  0  0 | 1 0 1 0 |
+| scs |  0  0   1  1 |  0  0  0 | 0 0 0 1 | 1 0 0 1 1 |
+| scc |  0  0   1  1 |  0  0  0 | 1 0 0 1 | 1 0 0 1 1 |
+| szs |  0  0   1  1 |  0  0  0 | 0 0 1 0 | 1 0 0 1 1 |
+| szc |  0  0   1  1 |  0  0  0 | 1 0 1 0 | 1 0 0 1 1 |
+| sns |  0  0   1  1 |  0  0  0 | 0 1 0 0 | 1 0 0 1 1 |
+| snc |  0  0   1  1 |  0  0  0 | 1 1 0 0 | 1 0 0 1 1 |
 
