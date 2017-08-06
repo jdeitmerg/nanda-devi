@@ -29,9 +29,11 @@ entity regfile is
            write_select : in integer range 0 to 19;
            write_data : in word_t;
            read_select0, read_select1 : in integer range 0 to 18;
-           read_data0, read_data1: out word_t;
-           read_pc, read_flags: out word_t;
-           write_pc, write_flags: in word_t;
+           read_data0, read_data1 : out word_t;
+           read_pc : out word_t;
+           read_flags : out flags_t;
+           write_pc : in word_t;
+           write_flags : in flags_t;
            flags_we : in std_logic -- Write enable to flags register. Not
                                    -- needed for write_select and
                                    -- write_data.
@@ -46,7 +48,7 @@ begin
     read_data0 <= registers(read_select0);
     read_data1 <= registers(read_select1);
     read_pc    <= registers(reg_pc);
-    read_flags <= registers(reg_flags);
+    read_flags <= flags_t(registers(reg_flags)(numflags-1 downto 0));
     
     process(clk)
     begin
@@ -58,7 +60,7 @@ begin
                 registers(reg_pc) <= write_pc;
             end if;
             if write_select /= reg_flags and flags_we = '1' then
-                registers(reg_flags) <= write_flags;
+                registers(reg_flags)(numflags-1 downto 0) <= write_flags;
             end if;
         end if;
     end process;

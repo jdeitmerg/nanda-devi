@@ -27,7 +27,6 @@ package common is
     constant alu_slr    : alu_op_t := "01001"; -- shift logical right
     constant alu_tst    : alu_op_t := "01010"; -- test (only set flags)
 
-
     -- Indices of special registers in regfile
     constant reg_pc    : integer range 0 to 18 := 16;
     constant reg_sp    : integer range 0 to 18 := 17;
@@ -46,7 +45,7 @@ package common is
     -- There are four possible sources for the data bus (which feeds the
     -- registers and memory write port): ALU output, first ALU argument,
     -- the immediate from the instruction decoder and memory.
-    subtype dsrc_t is integer range 0 to 3;
+    subtype dsrc_t is natural range 0 to 3;
     constant dsrc_ALU       : dsrc_t := 0;
     constant dsrc_arg0      : dsrc_t := 1;
     constant dsrc_immediate : dsrc_t := 2;
@@ -64,6 +63,13 @@ package common is
     constant mvcp_mv  : mvcp_t := "00";
     constant mvcp_ldm : mvcp_t := "01";
     constant mvcp_stm : mvcp_t := "10";
+
+    -- For reducing the width of the flags "busses":
+    subtype flags_t is std_logic_vector(2 downto 0);
+    constant flagpos_c : natural := 0;
+    constant flagpos_z : natural := 1;
+    constant flagpos_n : natural := 2;
+    constant numflags  : natural := 3;
 
 end common;
 

@@ -11,8 +11,8 @@ entity alu is
         arg0, arg1 : in word_t;
         op : in alu_op_t;
         result : out word_t;
-        carry_in : in std_logic;
-        carry_out, zero_out, neg_out: out std_logic
+        flags_in : in flags_t;
+        flags_out : out flags_t
     );
 end alu;
 
@@ -31,13 +31,14 @@ architecture arch of alu is
 begin
     -- Helper variables
     arg0_ext <= unsigned('0' & arg0);
-    carry_in_cast(0) <= carry_in;
+    carry_in_cast(0) <= flags_in(flagpos_c);
     arg1_cast <= unsigned(arg1);
     -- Outputs
     result <= std_logic_vector(res_ext(WORDWIDTH-1 downto 0));
-    carry_out <= res_ext(WORDWIDTH);
-    neg_out <= res_ext(WORDWIDTH-1);
-    zero_out <= '1' when res_ext(WORDWIDTH-1 downto 0) = 0 else '0';
+    flags_out(flagpos_c) <= res_ext(WORDWIDTH);
+    flags_out(flagpos_n) <= res_ext(WORDWIDTH-1);
+    flags_out(flagpos_z) <= '1' when res_ext(WORDWIDTH-1 downto 0) = 0
+                                                                else '0';
 
     res_ext <=  arg0_ext + arg1_cast
                     when (op = alu_add) else
