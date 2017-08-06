@@ -12,7 +12,7 @@ entity instr_decoder is
            data_src : out dsrc_t;
            immediate : out word_t;
            reg_dest, reg_src0, reg_src1 : out regnum_t;
-           flags_we : out std_logic
+           flags_we, mem_we : out std_logic
          );
 end instr_decoder;
 
@@ -59,8 +59,11 @@ begin
                                and (mvcp = mvcp_ldm))
                 else dsrc_ALU; -- seems like a sane default
 
-    -- Only update flags if ALU operation was performed
+    -- Only update flags if ALU operation is performed
     flags_we <= '1' when (instr_group = instrg_ALU) else '0';
+
+    -- Only write memory on stm instruction:
+    mem_we <= '1' when ((instr_group = instrg_cpy) and (mvcp = mvcp_stm)) else '0';
 
 end arch;
 
