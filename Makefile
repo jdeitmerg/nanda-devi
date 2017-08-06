@@ -1,7 +1,7 @@
 %.o: %.vhdl
 	ghdl -a $<
 
-cpu_tb: common.o alu.o regfile.o instr_decoder.o cpu.o
+cpu_tb: common.o alu.o regfile.o instr_decoder.o flow_cntrl.o cpu.o
 	#ghdl -e $@
 
 cpu.vcd: cpu_tb
