@@ -2,5 +2,5 @@
 *.swp
 *.cf
 *.o
-alu_tb
+cpu_tb
 *.vcd
