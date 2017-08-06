@@ -6,6 +6,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_textio.all;
+use STD.textio.all;
 use work.common.all;
 
 entity cpu_tb is
@@ -13,8 +15,6 @@ entity cpu_tb is
 end cpu_tb;
 
 architecture arch of cpu_tb is
-    constant RAMSIZE : natural := 1024*4;
-    constant ROMSIZE : natural := 1024*4;
 
     signal clk : std_logic;
     signal ram_addr, ram_read, ram_write : word_t;
@@ -22,13 +22,38 @@ architecture arch of cpu_tb is
     signal rom_addr, rom_data : word_t;
     signal rom_clk : std_logic;
 
-
     -- RAM and ROM:
+    constant RAMSIZE : natural := 1024*4;
+    constant ROMSIZE : natural := 1024*4;
+
     subtype byte_t is std_logic_vector(7 downto 0);
     type ram_t is array(0 to RAMSIZE-1) of byte_t;
     type rom_t is array(0 to ROMSIZE-1) of byte_t;
+
+
+    impure function ReadROMFile(FileName : STRING) return rom_t is
+      file FileHandle       : TEXT open READ_MODE is FileName;
+      variable CurrentLine  : LINE;
+      variable TempWord     : word_t; --STD_LOGIC_VECTOR((div_ceil(word_t'length, 4) * 4) - 1 downto 0);
+      variable Result       : rom_t    := (others => (others => '0'));
+
+    begin
+      for i in 0 to (ROMSIZE/4) - 1 loop
+        exit when endfile(FileHandle);
+
+        readline(FileHandle, CurrentLine);
+        hread(CurrentLine, TempWord);
+        Result(4*i+0)    := TempWord( 7 downto  0);
+        Result(4*i+1)    := TempWord(15 downto  8);
+        Result(4*i+2)    := TempWord(23 downto 16);
+        Result(4*i+3)    := TempWord(31 downto 24);
+      end loop;
+
+      return Result;
+    end function;
+
     signal ram : ram_t;
-    signal rom : rom_t;
+    signal rom : rom_t := ReadROMFile("ROM.hex");
 
     signal ram_addr_u : unsigned(WORDWIDTH-1 downto 0);
     signal rom_addr_u : unsigned(WORDWIDTH-1 downto 0);
@@ -58,11 +83,10 @@ begin
     process(rom_clk)
     begin
         if rising_edge(rom_clk) then
-            --rom_data <= rom(to_integer(rom_addr_u+3)) &
-            --            rom(to_integer(rom_addr_u+2)) &
-            --            rom(to_integer(rom_addr_u+1)) &
-            --            rom(to_integer(rom_addr_u+0));
-            rom_data <= "00100000000000000000000000010011"; -- NOP for now
+            rom_data <= rom(to_integer(rom_addr_u+3)) &
+                        rom(to_integer(rom_addr_u+2)) &
+                        rom(to_integer(rom_addr_u+1)) &
+                        rom(to_integer(rom_addr_u+0));
         end if;
     end process;
 

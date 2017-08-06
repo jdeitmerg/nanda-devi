@@ -1,10 +1,10 @@
 %.o: %.vhdl
-	ghdl -a $<
+	ghdl -a --std=08 $<
 
 cpu_tb: common.o alu.o regfile.o instr_decoder.o flow_cntrl.o cpu.o cpu_tb.o
-	ghdl -e $@
+	ghdl -e --std=08 $@
 
-cpu.vcd: cpu_tb
+cpu.vcd: cpu_tb ROM.hex
 	./cpu_tb --vcd=$@
 
 view: cpu.vcd 
