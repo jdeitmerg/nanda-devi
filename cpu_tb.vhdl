@@ -58,10 +58,11 @@ begin
     process(rom_clk)
     begin
         if rising_edge(rom_clk) then
-            rom_data <= rom(to_integer(rom_addr_u+3)) &
-                        rom(to_integer(rom_addr_u+2)) &
-                        rom(to_integer(rom_addr_u+1)) &
-                        rom(to_integer(rom_addr_u+0));
+            --rom_data <= rom(to_integer(rom_addr_u+3)) &
+            --            rom(to_integer(rom_addr_u+2)) &
+            --            rom(to_integer(rom_addr_u+1)) &
+            --            rom(to_integer(rom_addr_u+0));
+            rom_data <= "00100000000000000000000000010011"; -- NOP for now
         end if;
     end process;
 
@@ -74,6 +75,18 @@ begin
             ram(to_integer(ram_addr_u+1)) <= ram_write(15 downto  8);
             ram(to_integer(ram_addr_u+0)) <= ram_write( 7 downto  0);
         end if;
+    end process;
+
+    -- Clock simulation
+    process
+    begin
+        for i in 0 to 7 loop
+            clk <= '1';
+            wait for 1 us;
+            clk <= '0';
+            wait for 1 us;
+        end loop;
+        wait;
     end process;
 
 end arch;
