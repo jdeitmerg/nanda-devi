@@ -26,9 +26,9 @@ use work.common.all;
 
 entity regfile is
     port ( clk : in std_logic;
-           write_select : in integer range 0 to 19;
+           write_select : in regnum_t;
            write_data : in word_t;
-           read_select0, read_select1 : in integer range 0 to 18;
+           read_select0, read_select1 : in regnum_t;
            read_data0, read_data1 : out word_t;
            read_pc : out word_t;
            read_flags : out flags_t;
@@ -53,7 +53,7 @@ begin
     process(clk)
     begin
         if rising_edge(clk) then
-            if write_select /= 19 then
+            if write_select /= reg_discard then
                 registers(write_select) <= write_data;
             end if;
             if write_select /= reg_pc then

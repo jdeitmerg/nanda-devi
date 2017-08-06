@@ -11,7 +11,8 @@ entity instr_decoder is
            -- Selects which data is actually applied to the register inputs:
            data_src : out dsrc_t;
            immediate : out word_t;
-           reg_dest, reg_src0, reg_src1 : out integer range 0 to 19
+           reg_dest, reg_src0, reg_src1 : out regnum_t;
+           flags_we : out std_logic
          );
 end instr_decoder;
 
@@ -57,6 +58,9 @@ begin
                 dsrc_mem when ((instr_group = instrg_cpy)
                                and (mvcp = mvcp_ldm))
                 else dsrc_ALU; -- seems like a sane default
+
+    -- Only update flags if ALU operation was performed
+    flags_we <= '1' when (instr_group = instrg_ALU) else '0';
 
 end arch;
 

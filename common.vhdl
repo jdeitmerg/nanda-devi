@@ -28,9 +28,11 @@ package common is
     constant alu_tst    : alu_op_t := "01010"; -- test (only set flags)
 
     -- Indices of special registers in regfile
-    constant reg_pc    : integer range 0 to 18 := 16;
-    constant reg_sp    : integer range 0 to 18 := 17;
-    constant reg_flags : integer range 0 to 18 := 18;
+    subtype regnum_t is natural range 0 to 19;
+    constant reg_pc      : regnum_t := 16;
+    constant reg_sp      : regnum_t := 17;
+    constant reg_flags   : regnum_t := 18;
+    constant reg_discard : regnum_t := 19;
 
     -- Flow control defines and constants
     subtype flow_control_t is std_logic_vector(3 downto 0);
