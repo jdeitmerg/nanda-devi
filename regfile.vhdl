@@ -42,7 +42,7 @@ end regfile;
 
 architecture arch of regfile is
     type regfile_t is array (18 downto 0) of word_t;
-    signal registers : regfile_t;
+    signal registers : regfile_t := (others => (others => '0'));
 
 begin
     read_data0 <= registers(read_select0);
