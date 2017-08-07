@@ -104,5 +104,8 @@ begin
     -- instructions.
     ram_addr <= arg1;
 
+    -- The data written to memory comes from the data bus
+    ram_write <= data_bus;
+
 end arch;
 
