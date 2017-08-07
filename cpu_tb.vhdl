@@ -108,7 +108,7 @@ begin
     -- Clock simulation
     process
     begin
-        for i in 0 to 7 loop
+        for i in 0 to 15 loop
             clk <= '1';
             wait for 1 ns;
             clk <= '0';
