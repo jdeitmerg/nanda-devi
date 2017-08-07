@@ -1,6 +1,4 @@
 *~
 *.swp
-*.cf
-*.o
 cpu_tb
 *.vcd

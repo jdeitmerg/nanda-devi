@@ -1,26 +1,31 @@
-cpu_tb: cpu_tb.o
-	ghdl -e --std=08 $@
+WORKDIR=work
+GHDL_OPTIONS= -g --std=08 --workdir=$(WORKDIR)
+ANALYZE= -a $(GHDL_OPTIONS)
+ELABORATE= -e $(GHDL_OPTIONS)
 
-common.o: common.vhdl
-	ghdl -a --std=08 $<
+cpu_tb: $(WORKDIR)/cpu_tb.o
+	ghdl $(ELABORATE) $@
 
-cpu.o: cpu.vhdl common.o alu.o regfile.o instr_decoder.o flow_cntrl.o
-	ghdl -a --std=08 $<
+$(WORKDIR)/common.o: common.vhdl
+	ghdl $(ANALYZE) $<
 
-cpu_tb.o: cpu_tb.vhdl cpu.o
-	ghdl -a --std=08 $<
+$(WORKDIR)/cpu.o: cpu.vhdl $(WORKDIR)/common.o $(WORKDIR)/alu.o $(WORKDIR)/regfile.o $(WORKDIR)/instr_decoder.o $(WORKDIR)/flow_cntrl.o
+	ghdl $(ANALYZE) $<
 
-%.o: %.vhdl common.o
-	ghdl -a --std=08 $<
+$(WORKDIR)/cpu_tb.o: cpu_tb.vhdl $(WORKDIR)/cpu.o
+	ghdl $(ANALYZE) $<
 
-cpu.vcd: cpu_tb ROM.hex sigdump.conf
-	./cpu_tb --read-wave-opt=sigdump.conf --vcd=$@
+$(WORKDIR)/%.o: %.vhdl $(WORKDIR)/common.o
+	ghdl $(ANALYZE) $<
+
+simulate: cpu_tb ROM.hex sigdump.conf
+	./cpu_tb --read-wave-opt=sigdump.conf --vcd=cpu.vcd
+
+cpu.vcd: simulate
 
 view: cpu.vcd 
 	gtkwave cpu.vcd
 
 clean:
-	rm -rf *.o *.vcd work-obj93.cf cpu_tb
-
-all: cpu.vcd
+	rm -rf *.vcd cpu_tb $(WORKDIR)/*.o $(WORKDIR)/work-obj08.cf
 
