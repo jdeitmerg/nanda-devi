@@ -93,7 +93,7 @@ By numbering the groups as done below, only one 8th of the available
 instruction space is used.
 
 Source registers (src1, src0) can be any value if not applicable. If no
-register is to be written, dest has to be set to 19.
+register is to be written, dest has to be set to 31.
 
 | Group \ Bits     | 31 30 29 28 27 | 26 25 ... 16 15 | 14 13  ...  1  0 |
 |------------------|----------------|-----------------|------------------|
@@ -128,7 +128,7 @@ Only these ALU instructions update the flags register.
 | not  |  0  0   1 |  0  0   0 |  0  0  1  1  1 | 00000  |  src  | dest  |
 | sll  |  0  0   1 |  0  0   0 |  0  1  0  0  0 |  src1  |  src0 | dest  |
 | slr  |  0  0   1 |  0  0   0 |  0  1  0  0  1 |  src1  |  src0 | dest  |
-| tst  |  0  0   1 |  0  0   0 |  0  1  0  1  0 | 00000  |  src  | 10011 |
+| tst  |  0  0   1 |  0  0   0 |  0  1  0  1  0 | 00000  |  src  | 11111 |
 
 # Memory and copy instructions
 
@@ -141,8 +141,8 @@ Only these ALU instructions update the flags register.
 |     |  0  0   1  0 |  0  0   0 |       |           |         |        |
 |
 | mv  |  0  0   1  0 |  0  0   0 |  0  0 |  0 0 0 0  |   src   |  dest  |
-| ldm |  0  0   1  0 |  0  0   0 |  0  1 |   [src]   | 0 0 0 0 |  dest  |
-| stm |  0  0   1  0 |  0  0   0 |  1  0 |  [dest]   |   src   |  10011 |
+| ldm |  0  0   1  0 |  0  0   0 |  0  1 |   [src]   |  00000  |  dest  |
+| stm |  0  0   1  0 |  0  0   0 |  1  0 |  [dest]   |   src   |  11111 |
 
 
 # Conditions jumps/skips

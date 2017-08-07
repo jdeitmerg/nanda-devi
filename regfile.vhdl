@@ -45,15 +45,17 @@ architecture arch of regfile is
     signal registers : regfile_t := (others => (others => '0'));
 
 begin
-    read_data0 <= registers(read_select0);
-    read_data1 <= registers(read_select1);
+    read_data0 <= registers(read_select0)
+                    when read_select0 <= reg_max else (others => '0');
+    read_data1 <= registers(read_select1)
+                    when read_select1 <= reg_max else (others => '0');
     read_pc    <= registers(reg_pc);
     read_flags <= flags_t(registers(reg_flags)(numflags-1 downto 0));
     
     process(clk)
     begin
         if rising_edge(clk) then
-            if write_select /= reg_discard then
+            if write_select <= reg_max then
                 registers(write_select) <= write_data;
             end if;
             if write_select /= reg_pc then
