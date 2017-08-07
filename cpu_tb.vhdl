@@ -70,8 +70,12 @@ begin
                    rom_clk => rom_clk
                  );
 
-    rom_addr_u <= unsigned(rom_addr);
-    ram_addr_u <= unsigned(ram_addr);
+        rom_addr_u <= unsigned(rom_addr)
+                      when unsigned(rom_addr) <= (ROMSIZE-4)
+                      else (others => '0');
+        ram_addr_u <= unsigned(ram_addr)
+                      when unsigned(ram_addr) <= (RAMSIZE-4)
+                      else (others => '0');
 
     -- Asynchronous reading of RAM:
     ram_read <= ram(to_integer(ram_addr_u+3)) &
