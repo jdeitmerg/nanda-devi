@@ -106,9 +106,9 @@ begin
     begin
         for i in 0 to 7 loop
             clk <= '1';
-            wait for 1 us;
+            wait for 1 ns;
             clk <= '0';
-            wait for 1 us;
+            wait for 1 ns;
         end loop;
         wait;
     end process;

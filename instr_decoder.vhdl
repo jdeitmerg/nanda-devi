@@ -17,13 +17,14 @@ entity instr_decoder is
 end instr_decoder;
 
 architecture arch of instr_decoder is
-    alias instr_group : instrg_t is instruction(31 downto 27);
+    signal instr_group : instrg_t;
     -- Helper variables:
     signal immediate_shift : integer range 0 to 15;
     signal immediate_sgn_ext : signed(WORDWIDTH-1 downto 0);
     signal mvcp : mvcp_t;
 begin
-   
+
+    instr_group <= instruction(31 downto 27);
     
     -- The instruction set is designed to allow this:
     reg_dest <= to_integer(unsigned(instruction(4 downto 0)));
