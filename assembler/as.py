@@ -121,24 +121,24 @@ class instr_handler_alu(instr_handler):
         # list of supported mnemonics
         self.supported = [key for key in self.alu_ops]
 
-    def handle(self, mnemonic, dest=None, src0=None, src1=None):
-        assert_reg(src0)
+    def handle(self, mnemonic, arg0=None, arg1=None, arg2=None):
+        assert_reg(arg0)
         assert mnemonic in self.supported
         instr = instr_group['alu']
         instr += '0'*7
         instr += self.alu_ops[mnemonic]
         if mnemonic in ['not', 'tst']:
             instr += '00000'
-            instr += src0
+            instr += arg0
         else:
-            assert_reg(src1)
-            instr += src1
-            instr += src0
+            assert_reg(arg1)
+            assert_reg(arg2)
+            instr += arg2
+            instr += arg1
         if mnemonic == 'tst':
             instr += '11111'
         else:
-            assert_reg(dest)
-            instr += dest
+            instr += arg0
         return(instr)
         
 class instr_handler_mvcp(instr_handler):
