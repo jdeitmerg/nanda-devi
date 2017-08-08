@@ -39,8 +39,10 @@ begin
     immediate <= word_t(immediate_sgn_ext sll immediate_shift);
 
     -- At some point, we have to decide based on the instruction group:
-    flow_control <= flow_control_t(instruction(8 downto 5))
+    flow_control.command <= fc_op_t(instruction(7 downto 5))
                         when (instr_group = instrg_cond) else flowc_normal;
+    flow_control.inv <= instruction(8)
+                        when (instr_group = instrg_cond) else '0';
 
     -- For the different kinds of instructions, the data has to come from
     -- different sources:

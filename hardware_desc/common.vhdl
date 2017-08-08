@@ -35,14 +35,17 @@ package common is
     constant reg_max     : regnum_t := 18;
 
     -- Flow control defines and constants
-    subtype flow_control_t is std_logic_vector(3 downto 0);
-    constant flowc_normal : flow_control_t := "0000";
-    constant flowc_skipc  : flow_control_t := "0001";
-    constant flowc_skipz  : flow_control_t := "0010";
-    constant flowc_skipn  : flow_control_t := "0100";
-    -- If bit 3 is set, skip if flag is cleared. If it's cleared, skip if
-    -- flag is set.
-    constant flowc_inv_pos : integer := 3;
+    subtype fc_op_t is std_logic_vector(2 downto 0);
+    constant flowc_normal : fc_op_t := "000";
+    constant flowc_skipc  : fc_op_t := "001";
+    constant flowc_skipz  : fc_op_t := "010";
+    constant flowc_skipn  : fc_op_t := "100";
+    type flow_control_t is record
+        command: fc_op_t;
+        -- If bit 3 is set, skip if flag is cleared. If it's cleared, skip
+        -- if flag is set.
+        inv: std_logic;
+    end record;
 
     -- There are four possible sources for the data bus (which feeds the
     -- registers and memory write port): ALU output, first ALU argument,

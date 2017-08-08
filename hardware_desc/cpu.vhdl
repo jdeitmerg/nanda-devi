@@ -46,10 +46,9 @@ architecture arch of cpu is
 begin
     flow_controller : entity work.flow_cntrl
         port map ( flags => flags_read,
-                   flag_inv => fc_flaginv,
                    pc_current => pc_read,
                    pc_next => pc_write,
-                   command => fc_command
+                   fc_input => fc_command
                  );
 
     registers : entity work.regfile
