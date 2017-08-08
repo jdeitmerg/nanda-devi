@@ -34,7 +34,7 @@ architecture arch of cpu_tb is
     impure function ReadROMFile(FileName : STRING) return rom_t is
       file FileHandle       : TEXT open READ_MODE is FileName;
       variable CurrentLine  : LINE;
-      variable TempWord     : word_t; --STD_LOGIC_VECTOR((div_ceil(word_t'length, 4) * 4) - 1 downto 0);
+      variable TempWord     : word_t;
       variable Result       : rom_t    := (others => (others => '0'));
 
     begin
@@ -57,6 +57,8 @@ architecture arch of cpu_tb is
 
     signal ram_addr_u : unsigned(WORDWIDTH-1 downto 0);
     signal rom_addr_u : unsigned(WORDWIDTH-1 downto 0);
+
+    signal prev_rom_addr : unsigned(WORDWIDTH-1 downto 0) := ('1' others => '0');
 
 begin
     dut : entity work.cpu
@@ -108,7 +110,8 @@ begin
     -- Clock simulation
     process
     begin
-        for i in 0 to 15 loop
+        while rom_addr_u /= prev_rom_addr loop
+            prev_rom_addr <= rom_addr_u;
             clk <= '1';
             wait for 1 ns;
             clk <= '0';
