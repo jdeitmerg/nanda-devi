@@ -1,10 +1,6 @@
-10000013 nop              0000
-00000000 ldi r0, 0        0004
-00000080 ldi r0, 4        0008
-10010033 stm [r0], r1     000c
-10008002 ldm r2, [r0]     0010
-0805007f tst r3           0014
-00000004 ldi r4, 0        0018
-0805009f tst r4           001c
-10000210 mv pc, pc        0020
-08004090 add pc, pc, r4   0024
+000000a0 @0000 ldi r0, 5
+003fff81 @0004 ldi r1, -4
+08000022 @0008 add r2, r1, r0
+00000003 @000c ldi r3, 0
+10010c5f @0010 stm r3, r2 ; Save result of addition at address 0x00
+10000210 @0014 mv pc, pc ; loop forever
