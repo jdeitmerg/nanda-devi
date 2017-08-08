@@ -55,7 +55,7 @@ begin
     mvcp <= instruction(16 downto 15); -- Actual move/copy command
     data_src <= dsrc_immediate when (instr_group = instrg_ldi) else
                 dsrc_arg0 when ((instr_group = instrg_cpy)
-                                and (mvcp = mvcp_mv)) else
+                                and (mvcp = mvcp_mv or mvcp = mvcp_stm)) else
                 dsrc_mem when ((instr_group = instrg_cpy)
                                and (mvcp = mvcp_ldm))
                 else dsrc_ALU; -- seems like a sane default
