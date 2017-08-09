@@ -9,12 +9,12 @@ use (i.e. write assembly for), but to be as simple as possible.
 * It is a 32-bit architecture. Even the instructions have a fixed size of
   32 bits.
 * There are 19 registers:
- * 16 general purpose ones (r0 ... r15).
- * A program counter (pc) which is updated based on the instruction
+  * 16 general purpose ones (r0 ... r15).
+  * A program counter (pc) which is updated based on the instruction
    type. It can also be read and written like all other registers.
- * A stack pointer (sp) which has no special functionality, you have
+  * A stack pointer (sp) which has no special functionality, you have
    to do all pushing and poping "manually".
- * A flags register (flags) which contains the carry, zero and
+  * A flags register (flags) which contains the carry, zero and
    negative flag. It is update automatically by the ALU, but can
    also be read and written.
 * Clocking is very simple: There is a global clock, the instruction
@@ -27,17 +27,17 @@ use (i.e. write assembly for), but to be as simple as possible.
   Harvard's architecture. It is read-only (on the falling clock edge).
 * The CPU consists of two external busses (memory and code), internal
   busses and **five components**:
- * The **register file** contains the 19 registers and offers several
+  * The **register file** contains the 19 registers and offers several
    read and write ports to these.
- * The **arithmetic logical unit (ALU)** performs operations with
+  * The **arithmetic logical unit (ALU)** performs operations with
    one or two operands and generates one result. It also clears/sets the
    flags in the flags register.
- * The **instruction decoder** makes sure the correct signals are applied
+  * The **instruction decoder** makes sure the correct signals are applied
    to the correct busses.
- * The **flow controller** increments the pc by 4 on normal instructions.
+  * The **flow controller** increments the pc by 4 on normal instructions.
    On special skip instructions, it skips 2 instructions based on the
    flags in the flags register.
- * The **data bus demultiplexer** selects what data is applied to the
+  * The **data bus demultiplexer** selects what data is applied to the
    register file write and memory write busses.
 
 ## Running the simulation
