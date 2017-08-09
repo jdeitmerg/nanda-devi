@@ -77,7 +77,6 @@ again to rebuild the changed files and inspect the altered signals.
 ## ToDo
 
 * Create image representation of architecture for this README.
-* Write an assembler.
 * Memory mapping of ROM contents would be nice for initializing data
   segments.
 
