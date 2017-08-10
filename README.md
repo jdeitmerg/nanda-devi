@@ -1,6 +1,6 @@
-# About
+# Nanda Devi
 
-This is a simple CPU which was written to learn VHDL. The CPU is
+Nanda Devi is a simple CPU which was written to learn VHDL. The CPU is
 functional in simulation, however it is not yet completely tested.
 
 The structure of the CPU is not designed to be efficient or nice to
@@ -40,6 +40,10 @@ use (i.e. write assembly for), but to be as simple as possible.
   * The **data bus demultiplexer** selects what data is applied to the
    register file write and memory write busses.
 
+![CPU architecture](https://github.com/mowfask/nanda-devi/blob/master/documentation/cpu_architecture.png)
+
+For more information, have a look at the *documentation* folder.
+
 ## Running the simulation
 
 The CPU can be simulated using [ghdl](http://ghdl.free.fr/) which is
@@ -65,18 +69,42 @@ to have a look at the signals.
 
 ## Modifying the code
 
-You can play around with the components of the CPU, please have a look
-at the .vhdl files in the *hardware_desc* folder. Just run
+You can play with the code at two levels: Change the code running on the
+CPU or change the CPU itself. To program the CPU in assembler, have a look
+at the *assembler/example.asm* file. Run
+
+```
+assembler/as.py assembler/example.asm hardware_desc/ROM.hex
+make view
+```
+
+to assemble your code and run it.
+
+After modifying the .vhdl files in *hardware_desc/*, running
 
 ```
 make view
 ```
 
-again to rebuild the changed files and inspect the altered signals.
+in that folder should be enough to rebuild the changed files and inspect
+the altered signals.
+
+There is also
+
+```
+make clean
+```
+
+available if you want to remove all build files in order to rebuild
+everything from scratch.
 
 ## ToDo
 
-* Create image representation of architecture for this README.
 * Memory mapping of ROM contents would be nice for initializing data
   segments.
+
+# License
+
+Nanda Devi is released under the MIT License, which grants you lots of
+permissions. Have a look at the *LICENSE* file for mor information.
 
