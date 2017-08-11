@@ -1,14 +1,50 @@
-02500000 0000 ldi r0, 0x01000000 ; Address of std output
-00000901 0004 ldi r1, 0x48 ; 'H'
-1001003f 0008 stm r0, r1
-00000ca1 000c ldi r1, 0x65 ; 'e'
-1001003f 0010 stm r0, r1
-00000d81 0014 ldi r1, 0x6c ; 'l'
-1001003f 0018 stm r0, r1
-00000d81 001c ldi r1, 0x6c ; 'l'
-1001003f 0020 stm r0, r1
-00000de1 0024 ldi r1, 0x6f ; 'o'
-1001003f 0028 stm r0, r1
-00000141 002c ldi r1, 0x0a ; '\n'
-1001003f 0030 stm r0, r1
-10000210 0034 mv pc, pc ; This "hang instruction" ends the simulation
+00020011 0000 ldi sp, 0x1000 ; 4*1024
+0000008f 0004 ldi r15, 4 ; for incrementing and decrementing sp. Functions rely on r15 to be 4!
+000acf00 0008 ldi r0, 0x00005678
+03523401 000c ldi r1, 0x12340000
+08020400 0010 or r0, r0, r1
+0800be31 0014 sub sp, sp, r15
+00000181 0018 ldi r1, 12
+08004021 001c add r1, r1, pc
+1001443f 0020 stm sp, r1
+00001390 0024 ldi pc, @print_hex_nl
+00000000 0028 ldi r0, 0
+0800be31 002c sub sp, sp, r15
+00000181 0030 ldi r1, 12
+08004021 0034 add r1, r1, pc
+1001443f 0038 stm sp, r1
+00001390 003c ldi pc, @print_hex_nl
+10000210 0040 mv pc, pc ; hang forever - this stops the simulation
+02500001 0044 ldi r1, 0x01000000 ; Address of std output
+00000383 0048 ldi r3, 28 ; shift of first hexchar
+000001e4 004c ldi r4, 0xf ; mask for single hexval
+00000085 0050 ldi r5, 4 ; number of bits per hexchar
+00000147 0054 ldi r7, 10
+00000128 0058 ldi r8, 9
+08048c02 005c slr r2, r0, r3 ; shift input right by r3
+08031042 0060 and r2, r2, r4 ; mask out everything but current hexval
+00000606 0064 ldi r6, 0x30 ; '0' as a default base value
+0800891f 0068 sub drop, r8, r2
+1800019f 006c snc ; skip if positive
+00000ae6 0070 ldi r6, 0x57 ; 'a'-0xa as base value if in second case
+10000000 0074 mv r0, r0 ; nop as skip always skips two instructions
+08001842 0078 add r2, r2, r6
+1001045f 007c stm r1, r2 ; write resulting hexchar to stdout
+08009463 0080 sub r3, r3, r5
+1800009f 0084 sns
+00000b90 0088 ldi pc, @print_hex_loop
+10000000 008c mv r0, r0
+1000c401 0090 ldm r1, sp
+08003e31 0094 add sp, sp, r15
+10000030 0098 mv pc, r1
+0800be31 009c sub sp, sp, r15
+00000181 00a0 ldi r1, 12
+08004021 00a4 add r1, r1, pc
+1001443f 00a8 stm sp, r1
+00000890 00ac ldi pc, @print_hex
+02500001 00b0 ldi r1, 0x01000000 ; Address of std output
+00000142 00b4 ldi r2, 0x0a ; '\n'
+1001045f 00b8 stm r1, r2
+1000c401 00bc ldm r1, sp
+08003e31 00c0 add sp, sp, r15
+10000030 00c4 mv pc, r1
