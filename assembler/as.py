@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-''' This is a 'simple' assembler for the simple CPU of this project.
-    It is a clear example of how not to implement an assembler. Parsing
-    and opcode generation are not well separated and the output hexfile
-    is more of a by-product than anything else.
-
-    Nevertheless: It gets the job done. For now.
+''' This is a 'simple' assembler for the Nanda Devi CPU.
+    It is a clear example of how not to implement an assembler.
+    Honestly: Don't do it this way.
+    Nevertheless, it gets the job done. For now.
 
     The concept behind this is the following:
      * The lines of the input file are parsed, being divided into 
@@ -18,8 +16,9 @@
        which represent the 32-bit opcode. This representation is quite
        flexible and allows the opcode to be build up step by step.
      * The assembler class pulls all the handlers together. It calls
-       the correct one based on the mnemonic.
-     * Everything else is handled in the main function.
+       the correct one based on the mnemonic. This class also
+       splits lines into mnemoincs and arguments and (on the side)
+       handles labels.
 
 '''
 
@@ -187,12 +186,18 @@ class instr_handler_condfc(instr_handler):
         instr += '1'*5
         return(instr)
 
+labels = {}
+
 class assembler:
     ''' The assembler class 'only' creates the opcodes for a given
         instruction.
     '''
     def __init__(self):
         self.handlers = {}
+        self.address = 0
+        self.linenum = 1
+        self.outp_lines = []
+        self.unresolved = [] # Lines with unresolved labels
 
     def register(self, handler):
         for mnemonic in handler.get_supported():
@@ -208,6 +213,8 @@ class assembler:
             args = [instr[0]]
             for arg in instr[1:]:
                 decoded = decode_arg(arg)
+                if decoded == 'unknown_label':
+                    return(decoded)
                 if arg != None:
                     args.append(decoded)
 
@@ -218,6 +225,70 @@ class assembler:
             assert len(opcode_binstr) == 32
             opcode = int(opcode_binstr, 2)
             return(opcode)
+
+    def handle_line(self, line):
+        line_orig = line
+        if ';' in line:
+            # Drop dat comment
+            line = line[:line.find(';')]
+        line = line.strip() #No leading or trailing whitespace
+        if line.startswith('@'):
+            # Save address of label
+            label = line[:line.find(':')]
+            labels[label] = self.address
+            return(None)
+        # Prepare splitting by whitespace:
+        line = line.replace(',', ', ')
+        split = line.split(' ')
+        # Remove empty substrings:
+        split = [s for s in split if s != '']
+        # Remove ',' from substrings:
+        split = [s.replace(',', '') for s in split]
+        if len(split) == 0:
+            return(None)
+
+        opcode = asm.handle_instr(split)
+        if opcode != None:
+            if opcode == 'unknown_label':
+                resline = '' # Add empty line that gets filled up once
+                             # all labels are available.
+                # Save the linenumber, line, its destination and address
+                # for resolving the label later
+                self.unresolved.append((self.linenum, line_orig,
+                                        self.address, len(self.outp_lines)))
+            else:
+                resline = ('{:08x} '.format(opcode) +
+                           '{:04x} '.format(self.address) +
+                           line_orig.strip())
+            return(resline)
+        else:
+            return(None)
+
+    def add_line(self, line):
+        try:
+            resline = self.handle_line(line)
+            if resline != None:
+                self.outp_lines.append(resline)
+                self.address += 4
+        except Exception:
+            print('Error in line ', self.linenum, ': ', line, sep='')
+            raise
+        self.linenum += 1
+
+    def resolve_labels(self):
+        try:
+            for unresolved in self.unresolved:
+                self.linenum = unresolved[0]
+                self.address = unresolved[2]
+                line = unresolved[1]
+                resline = self.handle_line(line)
+                if resline == None:
+                    raise Exception('Unable to resolve label?')
+                else:
+                    self.outp_lines[unresolved[3]] = resline
+        except Exception:
+            print('Error in line ', self.linenum, ': ', line, sep='')
+            raise
 
 def decode_arg(arg):
     # Is it a register?
@@ -245,6 +316,14 @@ def decode_arg(arg):
     if arg[0] in '0123456789':
         return(positive*int(arg))
 
+    # Special case of constant: Label
+    if arg[0] == '@':
+        if arg in labels:
+            return(labels[arg])
+        else:
+            # Label is not yet available
+            return('unknown_label')
+
     # Unknown:
     return(None)
 
@@ -266,34 +345,11 @@ if __name__ == '__main__':
     asm.register(instr_handler_mvcp())
     asm.register(instr_handler_condfc())
 
-    with open(sourcefile, 'r') as sf, open(destfile, 'w') as df:
-        linecount = 0
-        address = 0
-        for line in sf:
-            linecount += 1
-            line_orig = line
-            try:
-                if ';' in line:
-                    # Drop dat comment
-                    line = line[:line.find(';')]
-                line = line.strip() #No leading or trailing whitespace
-                # Prepare splitting by whitespace:
-                line = line.replace(',', ', ')
-                split = line.split(' ')
-                # Remove empty substrings:
-                split = [s for s in split if s != '']
-                # Remove ',' from substrings:
-                split = [s.replace(',', '') for s in split]
-                if len(split) == 0:
-                    continue
+    with open(sourcefile, 'r') as f:
+        for line in f:
+            asm.add_line(line)
+    asm.resolve_labels()
 
-                opcode = asm.handle_instr(split)
-                if opcode != None:
-                    df.write('{:08x} '.format(opcode) +
-                             '@{:04x} '.format(address) +
-                             line_orig.strip() + '\n')
-                    address += 4
-            except Exception:
-                print('Error in line ', linecount, ': ', line_orig, sep='')
-                raise
+    with open(destfile, 'w') as f:
+        f.writelines('\n'.join(asm.outp_lines)+'\n')
 
