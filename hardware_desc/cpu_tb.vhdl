@@ -26,6 +26,9 @@ architecture arch of cpu_tb is
     constant RAMSIZE : natural := 1024*4;
     constant ROMSIZE : natural := 1024*4;
 
+    -- Memory mapped writing to stdout:
+    constant STDOUT_ADDR : unsigned(WORDWIDTH-1 downto 0) := X"01000000";
+
     subtype byte_t is std_logic_vector(7 downto 0);
     type ram_t is array(0 to RAMSIZE-1) of byte_t;
     type rom_t is array(0 to ROMSIZE-1) of byte_t;
@@ -55,8 +58,13 @@ architecture arch of cpu_tb is
     signal ram : ram_t;
     signal rom : rom_t := ReadROMFile("ROM.hex");
 
+    -- Addresses cast to unsiged
     signal ram_addr_u : unsigned(WORDWIDTH-1 downto 0);
     signal rom_addr_u : unsigned(WORDWIDTH-1 downto 0);
+
+    -- Addresses limited to maximum values
+    signal ram_addr_lim_u : unsigned(WORDWIDTH-1 downto 0);
+    signal rom_addr_lim_u : unsigned(WORDWIDTH-1 downto 0);
 
     signal prev_rom_addr : unsigned(WORDWIDTH-1 downto 0) := ('1' others => '0');
 
@@ -72,27 +80,28 @@ begin
                    rom_clk => rom_clk
                  );
 
-        rom_addr_u <= unsigned(rom_addr)
-                      when unsigned(rom_addr) <= (ROMSIZE-4)
-                      else (others => '0');
-        ram_addr_u <= unsigned(ram_addr)
-                      when unsigned(ram_addr) <= (RAMSIZE-4)
-                      else (others => '0');
+        rom_addr_u <= unsigned(rom_addr);
+        ram_addr_u <= unsigned(ram_addr);
+
+        rom_addr_lim_u <= rom_addr_u when rom_addr_u <= (ROMSIZE-4)
+                                     else (others => '0');
+        ram_addr_lim_u <= ram_addr_u when ram_addr_u <= (RAMSIZE-4)
+                                     else (others => '0');
 
     -- Asynchronous reading of RAM:
-    ram_read <= ram(to_integer(ram_addr_u+3)) &
-                ram(to_integer(ram_addr_u+2)) &
-                ram(to_integer(ram_addr_u+1)) &
-                ram(to_integer(ram_addr_u+0));
+    ram_read <= ram(to_integer(ram_addr_lim_u+3)) &
+                ram(to_integer(ram_addr_lim_u+2)) &
+                ram(to_integer(ram_addr_lim_u+1)) &
+                ram(to_integer(ram_addr_lim_u+0));
 
     -- Synchronous reading of ROM:
     process(rom_clk)
     begin
         if rising_edge(rom_clk) then
-            rom_data <= rom(to_integer(rom_addr_u+3)) &
-                        rom(to_integer(rom_addr_u+2)) &
-                        rom(to_integer(rom_addr_u+1)) &
-                        rom(to_integer(rom_addr_u+0));
+            rom_data <= rom(to_integer(rom_addr_lim_u+3)) &
+                        rom(to_integer(rom_addr_lim_u+2)) &
+                        rom(to_integer(rom_addr_lim_u+1)) &
+                        rom(to_integer(rom_addr_lim_u+0));
         end if;
     end process;
 
@@ -100,18 +109,20 @@ begin
     process(clk)
     begin
         if rising_edge(clk) and (ram_we = '1') then
-            ram(to_integer(ram_addr_u+3)) <= ram_write(31 downto 24);
-            ram(to_integer(ram_addr_u+2)) <= ram_write(23 downto 16);
-            ram(to_integer(ram_addr_u+1)) <= ram_write(15 downto  8);
-            ram(to_integer(ram_addr_u+0)) <= ram_write( 7 downto  0);
+            ram(to_integer(ram_addr_lim_u+3)) <= ram_write(31 downto 24);
+            ram(to_integer(ram_addr_lim_u+2)) <= ram_write(23 downto 16);
+            ram(to_integer(ram_addr_lim_u+1)) <= ram_write(15 downto  8);
+            ram(to_integer(ram_addr_lim_u+0)) <= ram_write( 7 downto  0);
         end if;
     end process;
 
     -- Clock simulation
     process
     begin
-        while rom_addr_u /= prev_rom_addr loop
-            prev_rom_addr <= rom_addr_u;
+        -- Run simulation until pc doesn't change anymore
+        -- ("hang instruction" mv pc, pc)
+        while rom_addr_lim_u /= prev_rom_addr loop
+            prev_rom_addr <= rom_addr_lim_u;
             clk <= '1';
             wait for 1 ns;
             clk <= '0';
@@ -120,5 +131,19 @@ begin
         wait;
     end process;
 
+    -- Memory mapped writing to stdout
+    process(clk)
+        -- byte to print:
+        alias pbyte : byte_t is ram_write(7 downto 0);
+        variable outstr : string(1 to 1);
+    begin
+        if rising_edge(clk)
+            and (ram_we = '1')
+            and (ram_addr_u = STDOUT_ADDR)
+        then
+            outstr(1) := character'val(to_integer(unsigned(pbyte)));
+            write(output, outstr);
+        end if;
+    end process;
 end arch;
 

@@ -1,11 +1,14 @@
-000000a0 @0000 ldi r0, 5
-003fff81 @0004 ldi r1, -4
-08000022 @0008 add r2, r1, r0
-00000003 @000c ldi r3, 0
-10010c5f @0010 stm r3, r2 ; Save result of addition at address 0x00
-0805001f @0014 tst r0
-1800009f @0018 sns ; skip following two instructions if negative flag
-00000083 @001c ldi r3, 4
-10000000 @0020 mv r0, r0
-10010c5f @0024 stm r3, r2
-10000210 @0028 mv pc, pc ; loop forever
+02500000 0000 ldi r0, 0x01000000 ; Address of std output
+00000901 0004 ldi r1, 0x48 ; 'H'
+1001003f 0008 stm r0, r1
+00000ca1 000c ldi r1, 0x65 ; 'e'
+1001003f 0010 stm r0, r1
+00000d81 0014 ldi r1, 0x6c ; 'l'
+1001003f 0018 stm r0, r1
+00000d81 001c ldi r1, 0x6c ; 'l'
+1001003f 0020 stm r0, r1
+00000de1 0024 ldi r1, 0x6f ; 'o'
+1001003f 0028 stm r0, r1
+00000141 002c ldi r1, 0x0a ; '\n'
+1001003f 0030 stm r0, r1
+10000210 0034 mv pc, pc ; This "hang instruction" ends the simulation
