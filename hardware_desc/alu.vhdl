@@ -22,15 +22,16 @@ architecture arch of alu is
     -- width automatically.
     subtype word_carry is unsigned(WORDWIDTH downto 0);
     signal arg0_ext : word_carry; -- first argument with a carry of 0
+    signal arg1_ext : word_carry; -- second argument with a carry of 0
     signal res_ext  : word_carry; -- result and output carry
     -- For setting the carry to 0 where it wouldn't make any sense:
-    signal carry_mask : word_carry :=
-                        not unsigned('1' & resize(unsigned'("0"), WORDWIDTH));
+    signal carry_mask : word_carry := ('0' others => '1');
     signal carry_in_cast : unsigned(0 downto 0);
     signal arg1_cast : unsigned(WORDWIDTH-1 downto 0);
 begin
     -- Helper variables
     arg0_ext <= unsigned('0' & arg0);
+    arg1_ext <= unsigned('0' & arg1);
     carry_in_cast(0) <= flags_in(flagpos_c);
     arg1_cast <= unsigned(arg1);
     -- Outputs
@@ -48,11 +49,11 @@ begin
                     when (op = alu_addc) else
                 arg0_ext - arg1_cast - carry_in_cast
                     when (op = alu_subc) else
-                (arg0_ext or arg1_cast) and carry_mask
+                arg0_ext or arg1_ext
                     when (op = alu_or) else
-                (arg0_ext xor arg1_cast) and carry_mask
+                arg0_ext xor arg1_ext
                     when (op = alu_xor) else
-                (arg0_ext and arg1_cast) and carry_mask
+                arg0_ext and arg1_ext
                     when (op = alu_and) else
                 (not arg0_ext) and carry_mask
                     when (op = alu_not) else
