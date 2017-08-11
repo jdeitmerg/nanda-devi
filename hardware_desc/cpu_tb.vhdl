@@ -64,7 +64,6 @@ architecture arch of cpu_tb is
 
     -- Addresses limited to maximum values
     signal ram_addr_lim_u : unsigned(WORDWIDTH-1 downto 0);
-    signal rom_addr_lim_u : unsigned(WORDWIDTH-1 downto 0);
 
     signal prev_rom_addr : unsigned(WORDWIDTH-1 downto 0) := ('1' others => '0');
 
@@ -83,8 +82,6 @@ begin
         rom_addr_u <= unsigned(rom_addr);
         ram_addr_u <= unsigned(ram_addr);
 
-        rom_addr_lim_u <= rom_addr_u when rom_addr_u <= (ROMSIZE-4)
-                                     else (others => '0');
         ram_addr_lim_u <= ram_addr_u when ram_addr_u <= (RAMSIZE-4)
                                      else (others => '0');
 
@@ -98,10 +95,18 @@ begin
     process(rom_clk)
     begin
         if rising_edge(rom_clk) then
-            rom_data <= rom(to_integer(rom_addr_lim_u+3)) &
-                        rom(to_integer(rom_addr_lim_u+2)) &
-                        rom(to_integer(rom_addr_lim_u+1)) &
-                        rom(to_integer(rom_addr_lim_u+0));
+            if rom_addr_u <= (ROMSIZE-4) then
+                -- Comment this in for debugging
+                -- very helpful on crashes!
+                -- report "ROM addr: " &
+                --      integer'image(to_integer(rom_addr_lim_u));
+                rom_data <= rom(to_integer(rom_addr_u+3)) &
+                            rom(to_integer(rom_addr_u+2)) &
+                            rom(to_integer(rom_addr_u+1)) &
+                            rom(to_integer(rom_addr_u+0));
+            else
+                rom_data <= x"10000210"; -- mv pc, pc; hang instruction
+            end if;
         end if;
     end process;
 
@@ -109,25 +114,38 @@ begin
     process(clk)
     begin
         if rising_edge(clk) and (ram_we = '1') then
-            ram(to_integer(ram_addr_lim_u+3)) <= ram_write(31 downto 24);
-            ram(to_integer(ram_addr_lim_u+2)) <= ram_write(23 downto 16);
-            ram(to_integer(ram_addr_lim_u+1)) <= ram_write(15 downto  8);
-            ram(to_integer(ram_addr_lim_u+0)) <= ram_write( 7 downto  0);
+            -- If writing outside of RAM area, that may
+            -- be handled elsewhere. It may also not
+            -- be handled at all.
+            if ram_addr_u <= (RAMSIZE-4) then
+                ram(to_integer(ram_addr_lim_u+3))
+                    <= ram_write(31 downto 24);
+                ram(to_integer(ram_addr_lim_u+2))
+                    <= ram_write(23 downto 16);
+                ram(to_integer(ram_addr_lim_u+1))
+                    <= ram_write(15 downto  8);
+                ram(to_integer(ram_addr_lim_u+0))
+                    <= ram_write( 7 downto  0);
+            end if;
         end if;
     end process;
 
     -- Clock simulation
     process
+        variable clkcnt : integer := 0;
     begin
         -- Run simulation until pc doesn't change anymore
         -- ("hang instruction" mv pc, pc)
-        while rom_addr_lim_u /= prev_rom_addr loop
-            prev_rom_addr <= rom_addr_lim_u;
+        while rom_addr_u /= prev_rom_addr loop
+            prev_rom_addr <= rom_addr_u;
             clk <= '1';
             wait for 1 ns;
             clk <= '0';
             wait for 1 ns;
+            clkcnt := clkcnt+1;
         end loop;
+        report "Simulation ended after " & integer'image(clkcnt)
+               & " cycles.";
         wait;
     end process;
 
