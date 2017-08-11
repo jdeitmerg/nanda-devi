@@ -290,6 +290,12 @@ class assembler:
             print('Error in line ', self.linenum, ': ', line, sep='')
             raise
 
+    def print_statistics(self):
+        # Only call this before resolve_labels()!
+        print('Program size (bytes):   decimal    hex')
+        print('                          {:d}       {:x}'.format(
+                   self.address, self.address))
+
 def decode_arg(arg):
     # Is it a register?
     if arg.startswith('r'):
@@ -350,8 +356,11 @@ if __name__ == '__main__':
     with open(sourcefile, 'r') as f:
         for line in f:
             asm.add_line(line)
+    asm.print_statistics()
     asm.resolve_labels()
 
     with open(destfile, 'w') as f:
         f.writelines('\n'.join(asm.outp_lines)+'\n')
+
+    print('Object code successfully written to', destfile)
 
