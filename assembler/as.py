@@ -303,6 +303,8 @@ def decode_arg(arg):
         return('10001')
     if arg == 'flags':
         return('10010')
+    if arg == 'drop':
+        return('11111')
 
     # Or is it a constant?
     positive = 1
