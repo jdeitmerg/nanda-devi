@@ -1,50 +1,186 @@
 00020011 0000 ldi sp, 0x1000 ; 4*1024
-0000008f 0004 ldi r15, 4 ; for incrementing and decrementing sp. Functions rely on r15 to be 4!
-000acf00 0008 ldi r0, 0x00005678
-03523401 000c ldi r1, 0x12340000
-08020400 0010 or r0, r0, r1
-0800be31 0014 sub sp, sp, r15
-00000181 0018 ldi r1, 12
-08004021 001c add r1, r1, pc
-1001443f 0020 stm sp, r1
-00001390 0024 ldi pc, @print_hex_nl
-00000000 0028 ldi r0, 0
-0800be31 002c sub sp, sp, r15
-00000181 0030 ldi r1, 12
-08004021 0034 add r1, r1, pc
-1001443f 0038 stm sp, r1
-00001390 003c ldi pc, @print_hex_nl
-10000210 0040 mv pc, pc ; hang forever - this stops the simulation
-02500001 0044 ldi r1, 0x01000000 ; Address of std output
-00000383 0048 ldi r3, 28 ; shift of first hexchar
-000001e4 004c ldi r4, 0xf ; mask for single hexval
-00000085 0050 ldi r5, 4 ; number of bits per hexchar
-00000147 0054 ldi r7, 10
-00000128 0058 ldi r8, 9
-08048c02 005c slr r2, r0, r3 ; shift input right by r3
-08031042 0060 and r2, r2, r4 ; mask out everything but current hexval
-00000606 0064 ldi r6, 0x30 ; '0' as a default base value
-0800891f 0068 sub drop, r8, r2
-1800019f 006c snc ; skip if positive
-00000ae6 0070 ldi r6, 0x57 ; 'a'-0xa as base value if in second case
-10000000 0074 mv r0, r0 ; nop as skip always skips two instructions
-08001842 0078 add r2, r2, r6
-1001045f 007c stm r1, r2 ; write resulting hexchar to stdout
-08009463 0080 sub r3, r3, r5
-1800009f 0084 sns
-00000b90 0088 ldi pc, @print_hex_loop
-10000000 008c mv r0, r0
-1000c401 0090 ldm r1, sp
-08003e31 0094 add sp, sp, r15
-10000030 0098 mv pc, r1
-0800be31 009c sub sp, sp, r15
-00000181 00a0 ldi r1, 12
-08004021 00a4 add r1, r1, pc
-1001443f 00a8 stm sp, r1
-00000890 00ac ldi pc, @print_hex
-02500001 00b0 ldi r1, 0x01000000 ; Address of std output
-00000142 00b4 ldi r2, 0x0a ; '\n'
-1001045f 00b8 stm r1, r2
-1000c401 00bc ldm r1, sp
-08003e31 00c0 add sp, sp, r15
-10000030 00c4 mv pc, r1
+0250000e 0004 ldi r14, 0x1000000
+0000008f 0008 ldi r15, 4
+08003dce 000c add r14, r14, r15 ; Address of Debug 0 in r14
+08003dcd 0010 add r13, r14, r15 ; Address of Debug 1 in r13
+000acf00 0014 ldi r0, 0x00005678
+03523401 0018 ldi r1, 0x12340000
+08020400 001c or r0, r0, r1
+0000008f 0020 ldi r15, 4
+0800be31 0024 sub sp, sp, r15
+0000018f 0028 ldi r15, 12
+080041ef 002c add r15, r15, pc
+100145ff 0030 stm sp, r15
+00005690 0034 ldi pc, @print_hex_nl
+00000360 0038 ldi r0, 27
+000000c1 003c ldi r1, 6
+0000008f 0040 ldi r15, 4
+0800be31 0044 sub sp, sp, r15
+0000018f 0048 ldi r15, 12
+080041ef 004c add r15, r15, pc
+100145ff 0050 stm sp, r15
+00001290 0054 ldi pc, @div_unsigned
+10000023 0058 mv r3, r1
+0000008f 005c ldi r15, 4
+0800be31 0060 sub sp, sp, r15
+0000018f 0064 ldi r15, 12
+080041ef 0068 add r15, r15, pc
+100145ff 006c stm sp, r15
+00005690 0070 ldi pc, @print_hex_nl
+10000060 0074 mv r0, r3 ; Remainder of division
+0000008f 0078 ldi r15, 4
+0800be31 007c sub sp, sp, r15
+0000018f 0080 ldi r15, 12
+080041ef 0084 add r15, r15, pc
+100145ff 0088 stm sp, r15
+00005690 008c ldi pc, @print_hex_nl
+10000210 0090 mv pc, pc ; hang forever - this stops the simulation
+0000008f 0094 ldi r15, 4
+0800be31 0098 sub sp, sp, r15
+1001447f 009c stm sp, r3
+0800be31 00a0 sub sp, sp, r15
+1001449f 00a4 stm sp, r4
+0800be31 00a8 sub sp, sp, r15
+100144bf 00ac stm sp, r5
+0800be31 00b0 sub sp, sp, r15
+100144df 00b4 stm sp, r6
+0800be31 00b8 sub sp, sp, r15
+100144ff 00bc stm sp, r7
+0800be31 00c0 sub sp, sp, r15
+1001451f 00c4 stm sp, r8
+0800be31 00c8 sub sp, sp, r15
+1001453f 00cc stm sp, r9
+0800be31 00d0 sub sp, sp, r15
+1001455f 00d4 stm sp, r10
+10000003 00d8 mv r3, r0 ; r3 = p
+10000024 00dc mv r4, r1 ; r4 = q
+00000027 00e0 ldi r7, 1 ; constant
+0000008f 00e4 ldi r15, 4
+0800be31 00e8 sub sp, sp, r15
+0000018f 00ec ldi r15, 12
+080041ef 00f0 add r15, r15, pc
+100145ff 00f4 stm sp, r15
+00003710 00f8 ldi pc, @leading_zeros
+10000008 00fc mv r8, r0 ; number of leading zeros of p
+10000080 0100 mv r0, r4
+0000008f 0104 ldi r15, 4
+0800be31 0108 sub sp, sp, r15
+0000018f 010c ldi r15, 12
+080041ef 0110 add r15, r15, pc
+100145ff 0114 stm sp, r15
+00003710 0118 ldi pc, @leading_zeros
+10000009 011c mv r9, r0
+00000000 0120 ldi r0, 0 ; quotient = 0
+10000061 0124 mv r1, r3 ; and remainder = p
+0800a128 0128 sub r8, r9, r8 ; initial shift = leading_zeros(q)-leading_zeros(p)
+1800019f 012c snc
+00002c90 0130 ldi pc, @div_unsigned_done
+10000000 0134 mv r0, r0
+1001311f 0138 stm r12, r8 ; Print shift to debug 0
+08042089 013c sll r9, r4, r8; q << shift
+080420ea 0140 sll r10, r7, r8 ; 1 << shift
+0800a43f 0144 sub drop, r1, r9; r - (q << shift)
+1800009f 0148 sns
+08002800 014c add r0, r0, r10
+0800a421 0150 sub r1, r1, r9
+08009d08 0154 sub r8, r8, r7 ; Next shift: One bit further to the right
+1800009f 0158 sns
+00002710 015c ldi pc, @div_unsigned_loop
+10000000 0160 mv r0, r0
+0000008f 0164 ldi r15, 4
+1000c40a 0168 ldm r10, sp
+08003e31 016c add sp, sp, r15
+1000c409 0170 ldm r9, sp
+08003e31 0174 add sp, sp, r15
+1000c408 0178 ldm r8, sp
+08003e31 017c add sp, sp, r15
+1000c407 0180 ldm r7, sp
+08003e31 0184 add sp, sp, r15
+1000c406 0188 ldm r6, sp
+08003e31 018c add sp, sp, r15
+1000c405 0190 ldm r5, sp
+08003e31 0194 add sp, sp, r15
+1000c404 0198 ldm r4, sp
+08003e31 019c add sp, sp, r15
+1000c403 01a0 ldm r3, sp
+08003e31 01a4 add sp, sp, r15
+1000c40e 01a8 ldm r14, sp
+0000008f 01ac ldi r15, 4
+08003e31 01b0 add sp, sp, r15
+100001d0 01b4 mv pc, r14
+00000001 01b8 ldi r1, 0
+0000002f 01bc ldi r15, 1 ; constant 1
+0805001f 01c0 tst r0 ; if negative flag is set now, there are no more zeros
+1800019f 01c4 snc
+00003b90 01c8 ldi pc, @leading_zeros_done
+10000000 01cc mv r0, r0
+08043c00 01d0 sll r0, r0, r15
+08003c21 01d4 add r1, r1, r15
+00003810 01d8 ldi pc, @leading_zeros_loop
+10000020 01dc mv r0, r1
+1000c40e 01e0 ldm r14, sp
+0000008f 01e4 ldi r15, 4
+08003e31 01e8 add sp, sp, r15
+100001d0 01ec mv pc, r14
+0000008f 01f0 ldi r15, 4
+0800be31 01f4 sub sp, sp, r15
+1001447f 01f8 stm sp, r3
+0800be31 01fc sub sp, sp, r15
+1001449f 0200 stm sp, r4
+0800be31 0204 sub sp, sp, r15
+100144bf 0208 stm sp, r5
+0800be31 020c sub sp, sp, r15
+100144df 0210 stm sp, r6
+0800be31 0214 sub sp, sp, r15
+100144ff 0218 stm sp, r7
+0800be31 021c sub sp, sp, r15
+1001451f 0220 stm sp, r8
+02500001 0224 ldi r1, 0x01000000 ; Address of std output
+00000383 0228 ldi r3, 28 ; shift of first hexchar
+000001e4 022c ldi r4, 0xf ; mask for single hexval
+00000085 0230 ldi r5, 4 ; number of bits per hexchar
+00000147 0234 ldi r7, 10
+00000128 0238 ldi r8, 9
+08048c02 023c slr r2, r0, r3 ; shift input right by r3
+08031042 0240 and r2, r2, r4 ; mask out everything but current hexval
+00000606 0244 ldi r6, 0x30 ; '0' as a default base value
+0800891f 0248 sub drop, r8, r2
+1800019f 024c snc ; skip if positive
+00000ae6 0250 ldi r6, 0x57 ; 'a'-0xa as base value if in second case
+10000000 0254 mv r0, r0 ; nop as skip always skips two instructions
+08001842 0258 add r2, r2, r6
+1001045f 025c stm r1, r2 ; write resulting hexchar to stdout
+08009463 0260 sub r3, r3, r5
+1800009f 0264 sns
+00004790 0268 ldi pc, @print_hex_loop
+10000000 026c mv r0, r0
+0000008f 0270 ldi r15, 4
+1000c408 0274 ldm r8, sp
+08003e31 0278 add sp, sp, r15
+1000c407 027c ldm r7, sp
+08003e31 0280 add sp, sp, r15
+1000c406 0284 ldm r6, sp
+08003e31 0288 add sp, sp, r15
+1000c405 028c ldm r5, sp
+08003e31 0290 add sp, sp, r15
+1000c404 0294 ldm r4, sp
+08003e31 0298 add sp, sp, r15
+1000c403 029c ldm r3, sp
+08003e31 02a0 add sp, sp, r15
+1000c40e 02a4 ldm r14, sp
+0000008f 02a8 ldi r15, 4
+08003e31 02ac add sp, sp, r15
+100001d0 02b0 mv pc, r14
+0000008f 02b4 ldi r15, 4
+0800be31 02b8 sub sp, sp, r15
+0000018f 02bc ldi r15, 12
+080041ef 02c0 add r15, r15, pc
+100145ff 02c4 stm sp, r15
+00003e10 02c8 ldi pc, @print_hex
+02500001 02cc ldi r1, 0x01000000 ; Address of std output
+00000142 02d0 ldi r2, 0x0a ; '\n'
+1001045f 02d4 stm r1, r2
+1000c40e 02d8 ldm r14, sp
+0000008f 02dc ldi r15, 4
+08003e31 02e0 add sp, sp, r15
+100001d0 02e4 mv pc, r14
