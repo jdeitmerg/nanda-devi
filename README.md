@@ -11,12 +11,12 @@ use (i.e. write assembly for), but to be as simple as possible.
 * There are 19 registers:
   * 16 general purpose ones (r0 ... r15).
   * A program counter (pc) which is updated based on the instruction
-   type. It can also be read and written like all other registers.
+    type. It can also be read and written like all other registers.
   * A stack pointer (sp) which has no special functionality, you have
-   to do all pushing and poping "manually".
-  * A flags register (flags) which contains the carry, zero and
-   negative flag. It is update automatically by the ALU, but can
-   also be read and written.
+    to do all pushing and poping "manually".
+  * A flags register (flags) which contains the carry, zero, negative
+    and overflow flags. It is updated automatically by the ALU, but can
+    also be read and written.
 * Clocking is very simple: There is a global clock, the instruction
   at the program counter address shall be provided at the falling
   edge, it is executed on the rising edge.
@@ -57,7 +57,8 @@ make simulate
 in the *hardware_desc* folder. The CPU will be build and it'll start
 executing instructions from the ROM.hex file.
 During simulation, the file cpu.vcd is created. It contains most of the
-signals inside the CPU dumped for inspection with gtkwave.
+signals inside the CPU dumped for inspection with
+[gtkwave](http://gtkwave.sourceforge.net/).
 
 Simply run
 
@@ -75,19 +76,21 @@ at the *assembler/example.asm* file. Run
 
 ```
 assembler/as.py assembler/example.asm hardware_desc/ROM.hex
+```
+
+to assemble your code and place it where the simulator will find it.
+
+You can also modify the .vhdl files in *hardware_desc/*.
+
+In both cases, running one of
+
+```
+make simulate
 make view
 ```
 
-to assemble your code and run it.
-
-After modifying the .vhdl files in *hardware_desc/*, running
-
-```
-make view
-```
-
-in that folder should be enough to rebuild the changed files and inspect
-the altered signals.
+in *hardware_desc* rebuilds the CPU and runs the (new) ROM.hex file. The
+latter opens up gtkwave again.
 
 There is also
 
@@ -100,11 +103,13 @@ everything from scratch.
 
 ## ToDo
 
+* Add conditional branching based on the combination of overflow
+  and carry.
 * Memory mapping of ROM contents would be nice for initializing data
   segments.
 
 # License
 
 Nanda Devi is released under the MIT License, which grants you lots of
-permissions. Have a look at the *LICENSE* file for mor information.
+permissions. Have a look at the *LICENSE* file for more information.
 
