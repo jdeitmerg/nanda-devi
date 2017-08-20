@@ -1,3 +1,11 @@
+-- This file is part of the Nanda Devi project.
+-- Nanda Devi is a simple CPU architecture which emerged from learning
+-- VHDL.
+--
+-- Copyright (c) 2017 Jonas Deitmerg
+--
+-- For licensing information, please refer to the LICENSE file.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use work.common.all;

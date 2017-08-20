@@ -1,3 +1,11 @@
+; This file is part of the Nanda Devi project.
+; Nanda Devi is a simple CPU architecture which emerged from learning
+; VHDL.
+;
+; Copyright (c) 2017 Jonas Deitmerg
+;
+; For licensing information, please refer to the LICENSE file.
+
 ; ABI used by all functions in this example:
 ; r0, r1, r2 are used for the first three arguments, everything else
 ; is passed on the stack.

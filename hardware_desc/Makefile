@@ -1,3 +1,11 @@
+# This file is part of the Nanda Devi project.
+# Nanda Devi is a simple CPU architecture which emerged from learning
+# VHDL.
+#
+# Copyright (c) 2017 Jonas Deitmerg
+#
+# For licensing information, please refer to the LICENSE file.
+
 WORKDIR=work
 GHDL_OPTIONS= -g --std=08 --workdir=$(WORKDIR)
 ANALYZE= -a $(GHDL_OPTIONS)

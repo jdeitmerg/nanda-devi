@@ -1,3 +1,11 @@
+-- This file is part of the Nanda Devi project.
+-- Nanda Devi is a simple CPU architecture which emerged from learning
+-- VHDL.
+--
+-- Copyright (c) 2017 Jonas Deitmerg
+--
+-- For licensing information, please refer to the LICENSE file.
+
 -- file common.vhdl
 --
 -- Includes generic defines as well as the constants of the instruction

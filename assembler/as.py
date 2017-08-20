@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+# This file is part of the Nanda Devi project.
+# Nanda Devi is a simple CPU architecture which emerged from learning
+# VHDL.
+#
+# Copyright (c) 2017 Jonas Deitmerg
+#
+# For licensing information, please refer to the LICENSE file.
+
 ''' This is a 'simple' assembler for the Nanda Devi CPU.
     It is a clear example of how not to implement an assembler.
     Honestly: Don't do it this way.
