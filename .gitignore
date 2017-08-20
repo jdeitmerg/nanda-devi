@@ -1,4 +1,6 @@
 *~
 *.swp
-cpu_tb
 *.vcd
+.gitignore
+e~*
+*_tb

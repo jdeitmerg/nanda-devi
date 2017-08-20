@@ -6,6 +6,9 @@ ELABORATE= -e $(GHDL_OPTIONS)
 cpu_tb: $(WORKDIR)/cpu_tb.o
 	ghdl $(ELABORATE) $@
 
+alu_tb: $(WORKDIR)/alu_tb.o
+	ghdl $(ELABORATE) $@
+
 $(WORKDIR)/common.o: common.vhdl
 	ghdl $(ANALYZE) $<
 
@@ -15,8 +18,14 @@ $(WORKDIR)/cpu.o: cpu.vhdl $(WORKDIR)/common.o $(WORKDIR)/alu.o $(WORKDIR)/regfi
 $(WORKDIR)/cpu_tb.o: cpu_tb.vhdl $(WORKDIR)/cpu.o
 	ghdl $(ANALYZE) $<
 
+$(WORKDIR)/alu_tb.o: alu_tb.vhdl $(WORKDIR)/alu.o
+	ghdl $(ANALYZE) $<
+
 $(WORKDIR)/%.o: %.vhdl $(WORKDIR)/common.o
 	ghdl $(ANALYZE) $<
+
+run_tests: alu_tb
+	./alu_tb
 
 simulate: cpu_tb ROM.hex sigdump.conf
 	./cpu_tb --read-wave-opt=sigdump.conf --vcd=cpu.vcd
@@ -27,5 +36,5 @@ view: cpu.vcd
 	gtkwave cpu.vcd
 
 clean:
-	rm -rf *.vcd cpu_tb $(WORKDIR)/*.o $(WORKDIR)/work-obj08.cf
+	rm -rf *.vcd cpu_tb alu_tb $(WORKDIR)/*.o $(WORKDIR)/work-obj08.cf
 
