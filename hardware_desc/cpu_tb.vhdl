@@ -28,6 +28,8 @@ architecture arch of cpu_tb is
 
     -- Memory mapped writing to stdout:
     constant STDOUT_ADDR : unsigned(WORDWIDTH-1 downto 0) := X"01000000";
+    constant DEBUG0_ADDR : unsigned(WORDWIDTH-1 downto 0) := X"01000004";
+    constant DEBUG1_ADDR : unsigned(WORDWIDTH-1 downto 0) := X"01000008";
 
     subtype byte_t is std_logic_vector(7 downto 0);
     type ram_t is array(0 to RAMSIZE-1) of byte_t;
@@ -98,8 +100,8 @@ begin
             if rom_addr_u <= (ROMSIZE-4) then
                 -- Comment this in for debugging
                 -- very helpful on crashes!
-                -- report "ROM addr: " &
-                --      integer'image(to_integer(rom_addr_lim_u));
+                --report "ROM addr: " &
+                --      integer'image(to_integer(rom_addr_u));
                 rom_data <= rom(to_integer(rom_addr_u+3)) &
                             rom(to_integer(rom_addr_u+2)) &
                             rom(to_integer(rom_addr_u+1)) &
@@ -162,6 +164,20 @@ begin
             outstr(1) := character'val(to_integer(unsigned(pbyte)));
             write(output, outstr);
         end if;
+        -- Debug output (print values by writing to RAM)
+        if rising_edge(clk)
+            and (ram_we = '1')
+            and (ram_addr_u = DEBUG0_ADDR)
+        then
+            report "Debug 0: 0x" & to_hstring(unsigned(ram_write));
+        end if;
+        if rising_edge(clk)
+            and (ram_we = '1')
+            and (ram_addr_u = DEBUG1_ADDR)
+        then
+            report "Debug 1: 0x" & to_hstring(unsigned(ram_write));
+        end if;
+
     end process;
 end arch;
 
