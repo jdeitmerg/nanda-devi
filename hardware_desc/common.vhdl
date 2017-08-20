@@ -70,11 +70,12 @@ package common is
     constant mvcp_stm : mvcp_t := "10";
 
     -- For reducing the width of the flags "busses":
-    subtype flags_t is std_logic_vector(2 downto 0);
     constant flagpos_c : natural := 0;
     constant flagpos_z : natural := 1;
     constant flagpos_n : natural := 2;
-    constant numflags  : natural := 3;
+    constant flagpos_o : natural := 3;
+    constant numflags  : natural := 4;
+    subtype flags_t is std_logic_vector(numflags-1 downto 0);
 
 end common;
 
